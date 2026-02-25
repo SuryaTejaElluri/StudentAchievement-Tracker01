@@ -2,6 +2,9 @@
 import React, { useEffect, useRef, useState } from "react";
 
 export default function AdminDashboard() {
+  const [theme, setTheme] = useState("dark");
+  const starsRef = useRef(null);
+
   const [submissions, setSubmissions] = useState([
     { id: 1, student: "Priya Sharma", event: "State Hackathon", category: "Technical", date: "2025-09-21" },
     { id: 2, student: "Rohan Kumar", event: "Blood Donation Camp", category: "Volunteering", date: "2025-09-20" },
@@ -11,25 +14,26 @@ export default function AdminDashboard() {
   const [search, setSearch] = useState("");
   const [filter, setFilter] = useState("All");
 
-  const [students] = useState(450);
-  const [records] = useState(1230);
+  const students = 450;
+  const records = 1230;
 
-  const starsRef = useRef(null);
-
-  // Star Background
+  // 🌌 Background stars (FIXED)
   useEffect(() => {
     const container = starsRef.current;
     if (!container) return;
+    container.innerHTML = "";
 
-    for (let i = 0; i < 100; i++) {
-      const star = document.createElement("div");
-      star.className = "star";
-      star.style.left = Math.random() * window.innerWidth + "px";
-      star.style.top = Math.random() * window.innerHeight + "px";
-      star.style.animationDuration = Math.random() * 10 + 10 + "s";
-      container.appendChild(star);
+    if (theme === "dark") {
+      for (let i = 0; i < 60; i++) {
+        const star = document.createElement("div");
+        star.className = "star";
+        star.style.left = Math.random() * 100 + "%";
+        star.style.animationDuration = Math.random() * 6 + 6 + "s";
+        star.style.width = star.style.height = Math.random() * 2 + 1 + "px";
+        container.appendChild(star);
+      }
     }
-  }, []);
+  }, [theme]);
 
   function handleApprove(id) {
     setSubmissions(prev => prev.filter(s => s.id !== id));
@@ -40,7 +44,6 @@ export default function AdminDashboard() {
   }
 
   function handleLogout() {
-    alert("Logged out successfully!");
     window.location.href = "/";
   }
 
@@ -50,205 +53,208 @@ export default function AdminDashboard() {
   );
 
   return (
-    <div className="root">
+    <div className={`page ${theme}`}>
       <style>{`
 
-      body { margin:0 }
+        html,body,#root{
+          margin:0;
+          padding:0;
+          width:100%;
+          min-height:100%;
+          overflow-x:hidden;
+          overflow-y:auto;
+          font-family:'Segoe UI',sans-serif;
+        }
 
-      .root {
-        position: fixed;
-        inset:0;
-        background: #0f172a;
-        color:#f1f5f9;
-        font-family: 'Segoe UI', sans-serif;
-        overflow:hidden;
-        display:flex;
-        justify-content:center;
-        align-items:center;
-      }
+        .page{
+          min-height:100vh;
+          display:flex;
+          flex-direction:column;
+          transition:0.4s;
+          overflow:hidden;
+        }
 
-      /* STAR BACKGROUND */
-      .star {
-        position:absolute;
-        width:2px;
-        height:2px;
-        background:#fff;
-        border-radius:50%;
-        opacity:0.5;
-        animation: float linear infinite;
-      }
+        .dark{
+          background:linear-gradient(to bottom,#000010,#050519,#000000);
+          color:#f1f5f9;
+        }
 
-      @keyframes float {
-        from { transform: translateY(0px); }
-        to { transform: translateY(100vh); }
-      }
+        .light{
+          background:linear-gradient(to right,#eef2f3,#dfe9f3);
+          color:#111;
+        }
 
-      .dashboard-wrapper {
-        width:90%;
-        max-width:1200px;
-        background:#111827;
-        border-radius:16px;
-        border:1px solid #334155;
-        box-shadow:0 0 40px rgba(0,0,0,0.6);
-        padding:30px;
-        position:relative;
-        z-index:5;
-      }
+        .container{
+          max-width:1200px;
+          width:92%;
+          margin:0 auto;
+          padding:40px 0;
+          flex:1;
+          position:relative;
+          z-index:5;
+        }
 
-      .navbar {
-        display:flex;
-        justify-content:space-between;
-        align-items:center;
-        margin-bottom:25px;
-      }
+        .navbar{
+          display:flex;
+          justify-content:space-between;
+          align-items:center;
+          margin-bottom:25px;
+        }
 
-      .logout-btn {
-        background:#ef4444;
-        border:none;
-        padding:8px 14px;
-        border-radius:8px;
-        color:white;
-        cursor:pointer;
-        font-weight:500;
-      }
+        .btn{
+          padding:8px 14px;
+          border-radius:8px;
+          border:none;
+          cursor:pointer;
+          font-weight:600;
+          margin-left:8px;
+        }
 
-      .logout-btn:hover {
-        box-shadow:0 0 12px #ef4444;
-      }
+        .toggle-btn{background:#6366f1;color:white;}
+        .logout-btn{background:#ef4444;color:white;}
 
-      h2 {
-        color:#6366f1;
-        margin-bottom:20px;
-      }
+        .stats{
+          display:grid;
+          grid-template-columns:repeat(3,1fr);
+          gap:20px;
+          margin-bottom:25px;
+        }
 
-      .stats {
-        display:grid;
-        grid-template-columns:repeat(3,1fr);
-        gap:20px;
-        margin-bottom:25px;
-      }
+        .card{
+          padding:20px;
+          border-radius:12px;
+          background:rgba(255,255,255,0.05);
+          backdrop-filter:blur(10px);
+          border:1px solid rgba(255,255,255,0.1);
+          transition:0.3s;
+        }
 
-      .card {
-        background:#1e293b;
-        padding:20px;
-        border-radius:12px;
-        border:1px solid #334155;
-        transition:0.3s;
-      }
+        .card:hover{
+          transform:translateY(-5px);
+          box-shadow:0 10px 25px rgba(0,0,0,0.4);
+        }
 
-      .card:hover {
-        transform:translateY(-5px);
-        border-color:#6366f1;
-        box-shadow:0 0 20px rgba(99,102,241,0.4);
-      }
+        table{
+          width:100%;
+          border-collapse:collapse;
+        }
 
-      .number {
-        font-size:28px;
-        font-weight:bold;
-        margin-top:8px;
-      }
+        th,td{padding:10px;}
+        th{background:#1e293b;}
 
-      .filters {
-        display:flex;
-        gap:15px;
-        margin-bottom:20px;
-      }
+        tr:hover{background:rgba(255,255,255,0.05);}
 
-      input, select {
-        padding:8px;
-        border-radius:6px;
-        border:1px solid #334155;
-        background:#0f172a;
-        color:#f1f5f9;
-      }
+        .success{background:#22c55e;color:black;}
+        .danger{background:#ef4444;color:white;}
 
-      table {
-        width:100%;
-        border-collapse:collapse;
-        background:#1e293b;
-        border-radius:12px;
-        overflow:hidden;
-      }
+        /* 🌌 FIXED STARS */
+        #stars{
+          position:fixed;
+          top:0;
+          left:0;
+          width:100%;
+          height:100%;
+          pointer-events:none;
+          z-index:1;
+          overflow:hidden;
+        }
 
-      th {
-        background:#0f172a;
-        padding:12px;
-        text-align:left;
-        color:#94a3b8;
-      }
+        .star{
+          position:absolute;
+          top:-10px;
+          background:white;
+          border-radius:50%;
+          opacity:0.8;
+          animation:fall linear infinite;
+        }
 
-      td {
-        padding:12px;
-        border-top:1px solid #334155;
-      }
+        @keyframes fall{
+          0%{transform:translateY(-10vh);opacity:0;}
+          10%{opacity:1;}
+          100%{transform:translateY(100vh);opacity:0;}
+        }
 
-      tr:hover {
-        background:#0f172a;
-      }
+        /* ================= FOOTER ================= */
 
-      .btn {
-        padding:6px 12px;
-        border:none;
-        border-radius:6px;
-        cursor:pointer;
-        margin-right:6px;
-        font-weight:500;
-      }
+        .footer{
+          position:relative;
+          padding:5px 5px;
+          background:rgba(255,255,255,0.05);
+          backdrop-filter:blur(15px);
+          border-top:1px solid rgba(255,255,255,0.1);
+          overflow:hidden;
+          margin-top:20px;
+          text-align:center;
+        }
 
-      .success {
-        background:#22c55e;
-        color:black;
-      }
+        .footer::before{
+          content:"";
+          position:absolute;
+          inset:0;
+          background:linear-gradient(120deg,#6a11cb,#2575fc,#ff00cc);
+          opacity:0.15;
+          animation:wave 12s linear infinite;
+        }
 
-      .danger {
-        background:#ef4444;
-        color:white;
-      }
+        @keyframes wave{
+          0%{background-position:0% 50%;}
+          100%{background-position:200% 50%;}
+        }
 
-      .success:hover { box-shadow:0 0 10px #22c55e; }
-      .danger:hover { box-shadow:0 0 10px #ef4444; }
+        .planet{
+          position:absolute;
+          border-radius:50%;
+          opacity:0.3;
+          animation:float 10s infinite alternate ease-in-out;
+        }
+
+        .planet.small{
+          width:40px;
+          height:40px;
+          background:radial-gradient(circle,#ff9a00,#ff0066);
+          bottom:10px;
+          left:10%;
+        }
+
+        .planet.blue{
+          width:30px;
+          height:30px;
+          background:radial-gradient(circle,#00c6ff,#0072ff);
+          top:10px;
+          right:15%;
+        }
+
+        @keyframes float{
+          from{transform:translateY(0);}
+          to{transform:translateY(-15px);}
+        }
+
+        @media(max-width:900px){
+          .stats{grid-template-columns:1fr;}
+        }
 
       `}</style>
 
-      <div ref={starsRef}></div>
+      <div id="stars" ref={starsRef}></div>
 
-      <div className="dashboard-wrapper">
+      <div className="container">
         <div className="navbar">
-          <div><b>AchieveTrack</b> Admin Panel</div>
-          <button className="logout-btn" onClick={handleLogout}>
-            Logout
-          </button>
+          <div><b>🌌 AchieveTrack</b> Admin Panel</div>
+          <div>
+            <button className="btn toggle-btn"
+              onClick={() => setTheme(theme === "dark" ? "light" : "dark")}>
+              {theme === "dark" ? "Light ☀" : "Dark 🌙"}
+            </button>
+            <button className="btn logout-btn" onClick={handleLogout}>
+              Logout
+            </button>
+          </div>
         </div>
-
-        <h2>Admin Dashboard</h2>
 
         <div className="stats">
-          <div className="card">
-            Pending Approvals
-            <div className="number">{filtered.length}</div>
-          </div>
-          <div className="card">
-            Total Students
-            <div className="number">{students}</div>
-          </div>
-          <div className="card">
-            Total Records
-            <div className="number">{records}</div>
-          </div>
-        </div>
-
-        <div className="filters">
-          <input
-            placeholder="Search student..."
-            value={search}
-            onChange={e => setSearch(e.target.value)}
-          />
-
-          <select value={filter} onChange={e => setFilter(e.target.value)}>
-            <option>All</option>
-            <option>Technical</option>
-            <option>Volunteering</option>
-          </select>
+          <div className="card">Pending Approvals <b>{filtered.length}</b></div>
+          <div className="card">Total Students <b>{students}</b></div>
+          <div className="card">Total Records <b>{records}</b></div>
         </div>
 
         <table>
@@ -261,23 +267,36 @@ export default function AdminDashboard() {
               <th>Actions</th>
             </tr>
           </thead>
-
           <tbody>
-            {filtered.map(s => (
+            {filtered.map(s=>(
               <tr key={s.id}>
                 <td>{s.student}</td>
                 <td>{s.event}</td>
                 <td>{s.category}</td>
                 <td>{s.date}</td>
                 <td>
-                  <button className="btn success" onClick={() => handleApprove(s.id)}>Approve</button>
-                  <button className="btn danger" onClick={() => handleReject(s.id)}>Reject</button>
+                  <button className="btn success"
+                    onClick={()=>handleApprove(s.id)}>Approve</button>
+                  <button className="btn danger"
+                    onClick={()=>handleReject(s.id)}>Reject</button>
                 </td>
               </tr>
             ))}
           </tbody>
         </table>
       </div>
+
+      <div className="footer">
+        <div className="planet small"></div>
+        <div className="planet blue"></div>
+
+        <h3>🌌 AchieveTrack</h3>
+        <p>Empowering Student Excellence Across the Galaxy</p>
+        <p style={{opacity:0.6,fontSize:"12px"}}>
+          © 2026 AchieveTrack • All Rights Reserved 🚀
+        </p>
+      </div>
+
     </div>
   );
 }
