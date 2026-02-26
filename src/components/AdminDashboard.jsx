@@ -17,7 +17,7 @@ export default function AdminDashboard() {
   const students = 450;
   const records = 1230;
 
-  // 🌌 Background stars (FIXED)
+  // 🌌 Background stars (UNCHANGED)
   useEffect(() => {
     const container = starsRef.current;
     if (!container) return;
@@ -94,11 +94,54 @@ export default function AdminDashboard() {
           z-index:5;
         }
 
+        /* ===== NAVBAR ===== */
+
         .navbar{
           display:flex;
           justify-content:space-between;
           align-items:center;
           margin-bottom:25px;
+        }
+
+        .nav-left{
+          display:flex;
+          align-items:center;
+          gap:25px;
+        }
+
+        .nav-links{
+          display:flex;
+          gap:18px;
+          margin-left:20px;
+        }
+
+        .nav-item{
+          font-size:14px;
+          font-weight:500;
+          cursor:pointer;
+          opacity:0.7;
+          transition:0.3s;
+          position:relative;
+        }
+
+        .nav-item:hover{
+          opacity:1;
+        }
+
+        .nav-item.active{
+          opacity:1;
+          font-weight:600;
+        }
+
+        .nav-item.active::after{
+          content:"";
+          position:absolute;
+          left:0;
+          bottom:-6px;
+          width:100%;
+          height:2px;
+          background:#6366f1;
+          border-radius:2px;
         }
 
         .btn{
@@ -112,6 +155,8 @@ export default function AdminDashboard() {
 
         .toggle-btn{background:#6366f1;color:white;}
         .logout-btn{background:#ef4444;color:white;}
+
+        /* ===== STATS ===== */
 
         .stats{
           display:grid;
@@ -148,6 +193,7 @@ export default function AdminDashboard() {
         .danger{background:#ef4444;color:white;}
 
         /* 🌌 FIXED STARS */
+
         #stars{
           position:fixed;
           top:0;
@@ -174,16 +220,16 @@ export default function AdminDashboard() {
           100%{transform:translateY(100vh);opacity:0;}
         }
 
-        /* ================= FOOTER ================= */
+        /* ===== FOOTER ===== */
 
         .footer{
           position:relative;
-          padding:5px 5px;
+          padding:1px 5px;
           background:rgba(255,255,255,0.05);
           backdrop-filter:blur(15px);
           border-top:1px solid rgba(255,255,255,0.1);
           overflow:hidden;
-          margin-top:20px;
+          margin-top:150px;
           text-align:center;
         }
 
@@ -239,12 +285,24 @@ export default function AdminDashboard() {
 
       <div className="container">
         <div className="navbar">
-          <div><b>🌌 AchieveTrack</b> Admin Panel</div>
+          <div className="nav-left">
+            <b>🌌 AchieveTrack</b> Admin Panel
+            <div className="nav-links">
+              <span className="nav-item active">Dashboard</span>
+              <span className="nav-item">Submissions</span>
+              <span className="nav-item">Reports</span>
+              <span className="nav-item">Settings</span>
+            </div>
+          </div>
+
           <div>
-            <button className="btn toggle-btn"
-              onClick={() => setTheme(theme === "dark" ? "light" : "dark")}>
+            <button
+              className="btn toggle-btn"
+              onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
+            >
               {theme === "dark" ? "Light ☀" : "Dark 🌙"}
             </button>
+
             <button className="btn logout-btn" onClick={handleLogout}>
               Logout
             </button>

@@ -3,8 +3,11 @@ import React, { useEffect, useRef, useState } from "react";
 export default function StudentDashboard() {
   const starsRef = useRef(null);
   const [theme, setTheme] = useState("dark");
+  const [showModal, setShowModal] = useState(false);
+  const [successMsg, setSuccessMsg] = useState("");
 
-  const [records] = useState([
+  // ✅ Records now dynamic
+  const [records, setRecords] = useState([
     {
       event: "National Robotics Olympiad",
       category: "Technical",
@@ -28,28 +31,24 @@ export default function StudentDashboard() {
     },
   ]);
 
+  // ✅ Form state
+  const [formData, setFormData] = useState({
+    event: "",
+    title: "",
+    category: "Technical",
+    date: "",
+  });
+
   const [total, setTotal] = useState(0);
   const [pending, setPending] = useState(0);
 
-  // Animated counters
+  // Counters update automatically
   useEffect(() => {
-    let t = 0;
-    let p = 0;
-    const totalVal = records.length;
-    const pendingVal = records.filter(r => r.status === "Pending").length;
-
-    const interval = setInterval(() => {
-      if (t < totalVal) t++;
-      if (p < pendingVal) p++;
-      setTotal(t);
-      setPending(p);
-      if (t === totalVal && p === pendingVal) clearInterval(interval);
-    }, 60);
-
-    return () => clearInterval(interval);
+    setTotal(records.length);
+    setPending(records.filter(r => r.status === "Pending").length);
   }, [records]);
 
-  // Stars (only dark mode)
+  // ⭐ Stars (UNCHANGED)
   useEffect(() => {
     const container = starsRef.current;
     if (!container) return;
@@ -69,9 +68,42 @@ export default function StudentDashboard() {
   }, [theme]);
 
   const getTopCategory = () => {
+    if (records.length === 0) return "-";
     const count = {};
     records.forEach(r => count[r.category] = (count[r.category] || 0) + 1);
     return Object.keys(count).reduce((a,b) => count[a] > count[b] ? a : b);
+  };
+
+  // ✅ Add Achievement
+  const handleAdd = () => {
+    if (!formData.event || !formData.title || !formData.date) return;
+
+    const newRecord = {
+      ...formData,
+      status: "Pending",
+    };
+
+    setRecords([newRecord, ...records]);
+
+    setSuccessMsg("Achievement Added Successfully 🚀");
+
+    setTimeout(() => {
+      setShowModal(false);
+      setSuccessMsg("");
+    }, 1200);
+
+    setFormData({
+      event: "",
+      title: "",
+      category: "Technical",
+      date: "",
+    });
+  };
+
+  // ✅ Delete Achievement
+  const handleDelete = (index) => {
+    const updated = records.filter((_, i) => i !== index);
+    setRecords(updated);
   };
 
   return (
@@ -90,10 +122,8 @@ export default function StudentDashboard() {
           width:100%;
           min-height:100vh;
           position:relative;
-          transition:background 0.4s ease, color 0.4s ease;
         }
 
-        /* 🌙 Dark Theme */
         .dark {
           background:
             radial-gradient(circle at 20% 20%, #1b2735 0%, transparent 40%),
@@ -102,7 +132,6 @@ export default function StudentDashboard() {
           color:white;
         }
 
-        /* ☀ Light Theme */
         .light {
           background:linear-gradient(to right,#eef2f3,#dfe9f3);
           color:#111;
@@ -122,7 +151,6 @@ export default function StudentDashboard() {
           padding:15px 20px;
           border-radius:12px;
           margin-bottom:25px;
-          transition:0.3s;
         }
 
         .dark .navbar {
@@ -143,28 +171,12 @@ export default function StudentDashboard() {
           font-size:13px;
           font-weight:600;
           margin-left:10px;
-          transition:0.3s;
         }
 
-        .btn:hover {
-          transform:translateY(-3px);
-        }
-
-        .toggle-btn {
-          background:#6c63ff;
-          color:white;
-        }
-
-        .logout-btn {
-          background:#ff4d4d;
-          color:white;
-        }
-
-        .add-btn {
-          background:#00c6ff;
-          color:white;
-          margin-bottom:20px;
-        }
+        .toggle-btn { background:#6c63ff; color:white; }
+        .logout-btn { background:#ff4d4d; color:white; }
+        .add-btn { background:#00c6ff; color:white; margin-bottom:20px; }
+        .delete-btn { background:#ff5555; color:white; padding:4px 8px; font-size:11px; }
 
         .grid {
           display:grid;
@@ -175,22 +187,14 @@ export default function StudentDashboard() {
         .card {
           padding:30px;
           border-radius:12px;
-          transition:0.3s;
         }
 
         .dark .card {
           background:rgba(255,255,255,0.05);
-          border:1px solid rgba(255,255,255,0.08);
         }
 
         .light .card {
           background:white;
-          border:1px solid #ddd;
-        }
-
-        .card:hover {
-          transform:translateY(-6px);
-          box-shadow:0 10px 25px rgba(0,0,0,0.3);
         }
 
         table {
@@ -202,10 +206,6 @@ export default function StudentDashboard() {
 
         th, td { padding:8px; }
 
-        tr { border-top:1px solid rgba(255,255,255,0.1); }
-
-        .light tr { border-top:1px solid #ddd; }
-
         .badge {
           padding:4px 8px;
           border-radius:6px;
@@ -216,7 +216,6 @@ export default function StudentDashboard() {
         .approved { background:#00ffcc; color:#002b2b; }
         .pending { background:#ffcc00; color:#2b2000; }
 
-        /* Stars */
         #stars {
           position:absolute;
           inset:0;
@@ -239,18 +238,50 @@ export default function StudentDashboard() {
           100% { transform:translateY(110vh); opacity:0; }
         }
 
+        .modal-overlay {
+          position:fixed;
+          inset:0;
+          background:rgba(0,0,0,0.65);
+          display:flex;
+          justify-content:center;
+          align-items:center;
+        }
+
+        .modal-box {
+          width:520px;
+          padding:35px;
+          border-radius:18px;
+          background:rgba(255,255,255,0.08);
+          backdrop-filter:blur(18px);
+        }
+
+        .modal-box input,
+        .modal-box select {
+          width:100%;
+          padding:10px;
+          margin-bottom:15px;
+          border-radius:8px;
+          border:1px solid #ccc;
+        }
+
+        .modal-actions {
+          display:flex;
+          justify-content:flex-end;
+          gap:12px;
+        }
+
+        .success-msg {
+          margin-top:15px;
+          color:#00ffcc;
+          font-weight:600;
+        }
+
         .footer {
           margin-top:50px;
           padding:15px;
           text-align:center;
           font-size:13px;
-          opacity:0.8;
         }
-
-        @media(max-width:900px){
-          .grid { grid-template-columns:1fr; }
-        }
-
       `}</style>
 
       <div id="stars" ref={starsRef}></div>
@@ -261,13 +292,10 @@ export default function StudentDashboard() {
           <div>
             <button
               className="btn toggle-btn"
-              onClick={() =>
-                setTheme(theme === "dark" ? "light" : "dark")
-              }
+              onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
             >
-              {theme === "dark" ? "Light ☀" : "Dark 🌙"}
+              Toggle
             </button>
-
             <button
               className="btn logout-btn"
               onClick={() => (window.location.href = "/")}
@@ -277,11 +305,9 @@ export default function StudentDashboard() {
           </div>
         </div>
 
-        <button className="btn add-btn">
-          ➕ Add Achievement 
+        <button className="btn add-btn" onClick={() => setShowModal(true)}>
+          ➕ Add Achievement
         </button>
-
-        <h3>My Achievements</h3>
 
         <div className="grid">
           <div className="card">
@@ -310,6 +336,7 @@ export default function StudentDashboard() {
                 <th>Title</th>
                 <th>Date</th>
                 <th>Status</th>
+                <th>Action</th>
               </tr>
             </thead>
             <tbody>
@@ -324,16 +351,66 @@ export default function StudentDashboard() {
                       {r.status}
                     </span>
                   </td>
+                  <td>
+                    <button className="delete-btn" onClick={() => handleDelete(i)}>
+                      Delete
+                    </button>
+                  </td>
                 </tr>
               ))}
             </tbody>
           </table>
         </div>
 
+        {showModal && (
+          <div className="modal-overlay">
+            <div className="modal-box">
+              <h2>Add Achievement</h2>
+
+              <input
+                type="text"
+                placeholder="Event Name"
+                value={formData.event}
+                onChange={(e)=>setFormData({...formData,event:e.target.value})}
+              />
+              <input
+                type="text"
+                placeholder="Title"
+                value={formData.title}
+                onChange={(e)=>setFormData({...formData,title:e.target.value})}
+              />
+              <select
+                value={formData.category}
+                onChange={(e)=>setFormData({...formData,category:e.target.value})}
+              >
+                <option>Technical</option>
+                <option>Cultural</option>
+                <option>Sports</option>
+                <option>Volunteering</option>
+              </select>
+              <input
+                type="date"
+                value={formData.date}
+                onChange={(e)=>setFormData({...formData,date:e.target.value})}
+              />
+
+              <div className="modal-actions">
+                <button className="btn logout-btn" onClick={()=>setShowModal(false)}>
+                  Cancel
+                </button>
+                <button className="btn toggle-btn" onClick={handleAdd}>
+                  Submit
+                </button>
+              </div>
+
+              {successMsg && <div className="success-msg">{successMsg}</div>}
+            </div>
+          </div>
+        )}
+
         <div className="footer">
           © 2026 AchieveTrack • Empowering Student Excellence 🚀
         </div>
-
       </div>
     </div>
   );
